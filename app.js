@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const helmet = require('helmet');
 const cors = require('cors');
+const axios = require('axios');
 
 app.use(helmet());
 app.use(
@@ -16,12 +17,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('port', process.env.PORT || 3000);
 
-app.get('/api/v1/place', (req, res) => {
-  res.json({ message: 'hello world!' });
-});
-
-app.post('/api/v1/place', (req, res) => {
-  console.log(req.body);
+app.get('/api/v1/place', async (req, res) => {
+  const value = req.query.value;
+  const api = await axios.get(
+    `http://webservice.recruit.co.jp/hotpepper/shop/v1/?key=${
+      process.env.API_KEY
+    }&keyword=${encodeURIComponent(value)}&format=json`
+  );
+  res.json(api.data);
 });
 
 app.listen(app.get('port'), () => {
